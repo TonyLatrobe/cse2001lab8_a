@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jenkins-ca-cert
+  namespace: observability
+data:
+  ca.crt: |
+    -----BEGIN CERTIFICATE-----
+    MIIDDzCCAfegAwIBAgIUEN4xrO7kt7o0Gsjq9+S0fyy5gFIwDQYJKoZIhvcNAQEL
+    BQAwFzEVMBMGA1UEAwwMMTAuMTUyLjE4My4xMB4XDTI2MDExNzAxMzg1OVoXDTM2
+    MDExNTAxMzg1OVowFzEVMBMGA1UEAwwMMTAuMTUyLjE4My4xMIIBIjANBgkqhkiG
+    9w0BAQEFAAOCAQ8AMIIBCgKCAQEA10va+cuiOgCI1z4Jn6SKv1CLz0FR9ITy11nB
+    cST5YkLyj4x5FdCpBRtrgnHels3FhZRH9QF3j9WTfz7CETZ+sEmKw0lNgyckvik4
+    udQVaaX/C0+k3rC7i1kGLc7lddP0v7ueh4I7Qyz0RQbj5WvxDcuy6WwkM+niKvNG
+    PCU6lyigjcG2r35lYtLbQbfPp8mgaut83tGc1Rbv+jvPulGGwt2oYpmunyl/BbnT
+    B+L16LqzOi+ZnEnMPwFkrGbrvgFEq4do5V/YamRd79y/RUvZenzs5p2ztqpYugZi
+    MuxfdOfQNZP4ZNO0GogTGqbCVtBBvslLEGNZocsbGyIduIzkiwIDAQABo1MwUTAd
+    BgNVHQ4EFgQUzUTb6NaiD7Jq8XTcdBsS1ZrhogwwHwYDVR0jBBgwFoAUzUTb6Nai
+    D7Jq8XTcdBsS1ZrhogwwDwYDVR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOC
+    AQEAhhgKNTAFHqcP+3KpbqJMNYKYC2/AKwyEe6ZMkxYAIFCiEOO6wr/CCGTtCC2B
+    yYTCMIIRH281S3IiaZszDkSlbpDF+s7rX/8n9gt98WfkW2h8rhA+P0/bLdRmzyi+
+    TPoDk/jNX6R853Fh5v7pgeAzPBWnyhp1i9NHD+iMht+VZfeNpkF49eOZ55wA0r2C
+    q1uwOw8zEhD3kLMSTD3lfWErkt9WWr4RVElfNsu+RGDWpu8hgpVHfEKlTYDBOBz3
+    9RYjclVqlUqztWqt7NlE95yiqiZBpzb1XIcBoLEhLbWeasINMCR9zGxr+qHObwxT
+    xZGuWqfyseDaqzwoi+nY0ndrLQ==
+    -----END CERTIFICATE-----

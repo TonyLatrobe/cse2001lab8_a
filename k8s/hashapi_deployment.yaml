@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hash-api
+  namespace: staging
+  labels:
+    app: hash-api
+    team: platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hash-api
+  template:
+    metadata:
+      labels:
+        app: hash-api
+        team: platform
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      volumes:
+        - name: app-source
+          configMap:
+            name: hash-api-source
+      containers:
+        - name: hash-api
+          image: localhost:32000/python-ci:lab
+          imagePullPolicy: IfNotPresent
+          command: ["python", "/app/server.py"]
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: app-source
+              mountPath: /app
+          envFrom:
+            - configMapRef:
+                name: hash-api-config    # LOG_LEVEL + PORT — managed by Terraform
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            failureThreshold: 3
