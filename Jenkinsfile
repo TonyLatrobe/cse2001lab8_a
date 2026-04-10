@@ -290,13 +290,27 @@ spec:
               -input=false \
               -plugin-dir=/usr/local/terraform-plugins
 
-            # -detailed-exitcode: distinguishes errors (1) from pending changes (2)
+            # Disable immediate exit on error so we can capture the code
+            set +e 
+            
             terraform plan \
               -input=false \
               -out=tfplan \
               -detailed-exitcode
+            
             PLAN_EXIT=$?
-            [ "$PLAN_EXIT" -eq 1 ] && exit 1
+            
+            # Re-enable exit on error
+            set -e
+
+            # 0 = No changes, 2 = Changes detected. Both are "Success" for a plan.
+            if [ "$PLAN_EXIT" -eq 1 ]; then
+              echo "Terraform plan failed!"
+              exit 1
+            fi
+
+            terraform show -json tfplan > ../terraform-plan.json
+            echo "Terraform plan exit code: $PLAN_EXIT (Success)"
 
             terraform show -json tfplan > ../terraform-plan.json
             echo "Terraform plan exit code: $PLAN_EXIT (0=no changes, 2=drift detected)"
