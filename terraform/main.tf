@@ -1,7 +1,3 @@
-# `terraform/main.tf`
-# Terraform manages three resources: the staging namespace, a `ResourceQuota` (enforcing cluster resource ceilings), and a `ConfigMap` injecting runtime config into the hash-api pod. The app deployment itself is managed by `kubectl apply` — clean separation of infrastructure from application lifecycle.
-
-# hcl
 # terraform/main.tf
 # IaC: Terraform provisions staging infrastructure.
 # Manages: Namespace, ResourceQuota, ConfigMap (app config).
@@ -15,16 +11,18 @@ terraform {
       version = "2.25.2"
     }
   }
-  # Local backend — acceptable for this lab.
-  # Production: use remote state (S3, GCS, Terraform Cloud).
-  backend "local" {
-    path = "/tmp/terraform-staging.tfstate"
+
+  # Kubernetes backend — persists state inside the cluster (Secret).
+  # This makes CI/CD runs idempotent even with ephemeral Jenkins agents.
+  backend "kubernetes" {
+    secret_suffix = "terraform-state"
+    namespace     = "observability"
   }
 }
 
 provider "kubernetes" {
   # In-cluster config — consumes the pod's own ServiceAccount token.
-  host = "https://kubernetes.default.svc"
+  host                   = "https://kubernetes.default.svc"
   token                  = file("/var/run/secrets/kubernetes.io/serviceaccount/token")
   cluster_ca_certificate = file("/var/run/secrets/kubernetes.io/serviceaccount/ca.crt")
 }
@@ -53,6 +51,7 @@ resource "kubernetes_resource_quota" "staging" {
       managed-by = "terraform"
     }
   }
+
   spec {
     hard = {
       "requests.cpu"    = "500m"
@@ -77,6 +76,7 @@ resource "kubernetes_config_map" "hash_api_config" {
       app        = "hash-api"
     }
   }
+
   data = {
     LOG_LEVEL = "INFO"
     PORT      = "8080"
