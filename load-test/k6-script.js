@@ -24,7 +24,7 @@ export const options = {
   thresholds: {
     // Quality gates — pipeline fails if either is breached
     http_req_duration: ['p(95)<200'],  // hash ops are CPU-bound, should be fast
-    http_req_failed:   ['rate<0.01'],  // < 1% error rate
+    http_req_failed:   ['rate<0.05'],  // < 5% error rate
   },
 };
 

@@ -288,10 +288,9 @@ spec:
             nuclei \
               -u http://${API_HOST}:${API_PORT} \
               -tags misconfig,exposure \
+              -td /nuclei-templates \
               -o nuclei-results.txt \
               -silent || true
-            echo "=== DAST Results ==="
-            cat nuclei-results.txt 2>/dev/null || echo "No findings"
           """
         }
       }

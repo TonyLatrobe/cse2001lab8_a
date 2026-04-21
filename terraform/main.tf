@@ -12,11 +12,12 @@ terraform {
     }
   }
 
-  # Kubernetes backend — persists state inside the cluster (Secret).
-  # This makes CI/CD runs idempotent even with ephemeral Jenkins agents.
-  backend "kubernetes" {
-    secret_suffix = "terraform-state"
-    namespace     = "observability"
+  # Local backend — state written to /tmp on the Jenkins agent pod.
+  # Ephemeral by design: each pipeline run starts clean and imports
+  # existing resources via the import blocks below, so state loss
+  # between runs is safe and expected.
+  backend "local" {
+    path = "/tmp/terraform-staging.tfstate"
   }
 }
 
@@ -25,6 +26,26 @@ provider "kubernetes" {
   host                   = "https://kubernetes.default.svc"
   token                  = file("/var/run/secrets/kubernetes.io/serviceaccount/token")
   cluster_ca_certificate = file("/var/run/secrets/kubernetes.io/serviceaccount/ca.crt")
+}
+
+# ── Import blocks (Terraform 1.5+) ────────────────────────────────────────────
+# Reconciles existing cluster resources into Terraform state automatically.
+# Safe to keep permanently — if a resource is already in state, import is a
+# no-op. If it does not exist yet, Terraform creates it normally.
+
+import {
+  to = kubernetes_namespace.staging
+  id = "staging"
+}
+
+import {
+  to = kubernetes_resource_quota.staging
+  id = "staging/staging-quota"
+}
+
+import {
+  to = kubernetes_config_map.hash_api_config
+  id = "staging/hash-api-config"
 }
 
 # ── Namespace ──────────────────────────────────────────────────────────────────
